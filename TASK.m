@@ -97,12 +97,13 @@ end
 
 TASK_ddotx_desN = zeros(PARA_n_EO,PARA_N);
 
-if PARA_useSaveData
-    TASK_poserr = zeros(PARA_n_EO,PARA_N);                   
-    TASK_velerr = zeros(PARA_n_EO,PARA_N);                       
-    TASK_kpposerr = zeros(PARA_n_EO,PARA_N);                          
-    TASK_kdvelerr = zeros(PARA_n_EO,PARA_N);                            
-end
+% Variables used for diagnosing task issues
+%if PARA_useSaveData
+%    TASK_poserr = zeros(PARA_n_EO,PARA_N);                   
+%    TASK_velerr = zeros(PARA_n_EO,PARA_N);                       
+%    TASK_kpposerr = zeros(PARA_n_EO,PARA_N);                          
+%    TASK_kdvelerr = zeros(PARA_n_EO,PARA_N);                            
+%end
 
 for i=1:(PARA_N+1)
     
@@ -131,10 +132,11 @@ for i=1:(PARA_N+1)
     task_q = task_q + PARA_deltat_simu*task_dotq + 0.5*(PARA_deltat_simu^2)*task_ddotq_des;
     task_dotq = task_dotq + PARA_deltat_simu*task_ddotq_des;
     
-    if PARA_useSaveData
-        TASK_poserr(:,i) = task_x_err;
-        TASK_velerr(:,i) = task_dotx_err;
-        TASK_kpposerr(:,i) = PARA_kp*task_x_err;
-        TASK_kdvelerr(:,i) = PARA_kd*task_dotx_err;
-    end
+    % Variables used for diagnosing task issues
+    %if PARA_useSaveData
+    %    TASK_poserr(:,i) = task_x_err;
+    %    TASK_velerr(:,i) = task_dotx_err;
+    %    TASK_kpposerr(:,i) = PARA_kp*task_x_err;
+    %    TASK_kdvelerr(:,i) = PARA_kd*task_dotx_err;
+    %end
 end
