@@ -37,10 +37,11 @@ global SAVE_ddotx_desall;
 global SAVE_x_all;
 global SAVE_x_refall;
 
-global SAVE_poserr;           
-global SAVE_velerr;                 
-global SAVE_kpposerr;                      
-global SAVE_kdvelerr; 
+% Variables used for diagnosing task issues
+% global SAVE_poserr;           
+% global SAVE_velerr;                 
+% global SAVE_kpposerr;                      
+% global SAVE_kdvelerr; 
 
 global TASK_q_ref;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
