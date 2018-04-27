@@ -21,10 +21,11 @@ global SAVE_ddotx_refall;
 global SAVE_ddotx_desall;
 global SAVE_x_all;
 global SAVE_x_refall;
-global SAVE_poserr;           
-global SAVE_velerr;                 
-global SAVE_kpposerr;                      
-global SAVE_kdvelerr; 
+% Variables used for diagnosing task issues
+% global SAVE_poserr;           
+% global SAVE_velerr;                 
+% global SAVE_kpposerr;                      
+% global SAVE_kdvelerr; 
 
 
 % Calling global variables from other script
@@ -87,10 +88,10 @@ if PARA_useReduced
     save_rpy = tr2rpy(save_x);
     SAVE_x_all=[SAVE_x_all,[save_x(1:3,4);save_rpy']];
     SAVE_x_refall= TASK_x_refN;
-    SAVE_poserr = [SAVE_poserr,TASK_poserr(:,1)];           
-    SAVE_velerr = [SAVE_poserr,TASK_velerr(:,1)];                 
-    SAVE_kpposerr = [SAVE_kpposerr,TASK_kpposerr(:,1)];                     
-    SAVE_kdvelerr = [SAVE_kdvelerr,TASK_kdvelerr(:,1)]; 
+%    SAVE_poserr = [SAVE_poserr,TASK_poserr(:,1)];           
+%    SAVE_velerr = [SAVE_poserr,TASK_velerr(:,1)];                 
+%    SAVE_kpposerr = [SAVE_kpposerr,TASK_kpposerr(:,1)];                     
+%    SAVE_kdvelerr = [SAVE_kdvelerr,TASK_kdvelerr(:,1)]; 
     
     
 % Using detailed form
@@ -110,8 +111,8 @@ else
     save_rpy = tr2rpy(save_x);
     SAVE_x_all=[SAVE_x_all,[save_x(1:3,4);save_rpy']];
     SAVE_x_refall= TASK_x_refN;
-    SAVE_poserr = [SAVE_poserr,TASK_poserr(:,1)];           
-    SAVE_velerr = [SAVE_poserr,TASK_velerr(:,1)];                 
-    SAVE_kpposerr = [SAVE_kpposerr,TASK_kpposerr(:,1)];                     
-    SAVE_kdvelerr = [SAVE_kdvelerr,TASK_kdvelerr(:,1)]; 
+%    SAVE_poserr = [SAVE_poserr,TASK_poserr(:,1)];           
+%    SAVE_velerr = [SAVE_poserr,TASK_velerr(:,1)];                 
+%    SAVE_kpposerr = [SAVE_kpposerr,TASK_kpposerr(:,1)];                     
+%    SAVE_kdvelerr = [SAVE_kdvelerr,TASK_kdvelerr(:,1)]; 
 end
