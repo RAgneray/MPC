@@ -1,6 +1,6 @@
 
 %                       CONSTRAINTS
-% MPC v. 2.1
+% MPC v. 2.2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This function is used for the computation of the constraints matrices and
 % vector needed by the optimization problem
