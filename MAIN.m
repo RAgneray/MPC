@@ -1,6 +1,6 @@
 
 %                           MAIN
-% MPC v. 2.1
+% MPC v. 2.2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Main script for the MPC control simulation 
