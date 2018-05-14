@@ -1,6 +1,6 @@
 
 %                       MPC
-% MPC v. 2.1
+% MPC v. 2.2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This script execute the computation of a horizon of control
@@ -94,7 +94,7 @@ if PARA_useReduced
         end
     
     % CVX solver
-    else
+    elseif strcmp(PARA_solverSelect,'cvx')
         % Opening cvx environnement
         cvx_solver sedumi
         cvx_begin quiet
@@ -104,7 +104,40 @@ if PARA_useReduced
                 cons_out{1} * tau <= cons_out{2};
         cvx_end  
         
-        MPC_tau_app = tau(1:PARA_n,1);
+        % Oversight condition and setting up of the control output (reduced)
+        if strcmp(cvx_status,'Infeasible')
+            MPC_stopComputation = true;
+        else
+            MPC_tau_app = tau(1:PARA_n,1);
+        end
+     
+    %OSQP solver
+    elseif strcmp(PARA_solverSelect,'osqp')
+        % Creating OSQP object
+        mpc_prob = osqp;
+        
+        % Computing matrix Q and vector p for the OSQP optimization function
+        mpc_Q = [sqrt(PARA_omegak)*mpc_E;mpc_E_reg]'*[sqrt(PARA_omegak)*mpc_E;mpc_E_reg];
+        mpc_p = -([sqrt(PARA_omegak)*mpc_E;mpc_E_reg]'*[sqrt(PARA_omegak)*mpc_f;mpc_f_reg]);
+        
+        % Setting up OSQP workplace
+        mpc_osqpOptions = mpc_prob.default_settings();
+        mpc_osqpOptions.verbose = false;
+        
+        if isempty(cons_out{1})
+            mpc_prob.setup(mpc_Q, mpc_p, eye((size(mpc_Q,1))), -inf(size(mpc_Q,1),1), inf(size(mpc_Q,1),1), 'warm_start', true);
+        else
+            mpc_prob.setup(mpc_Q, mpc_p, cons_out{1}, -inf(size(cons_out{1},1),1), cons_out{2}, mpc_osqpOptions);
+        end
+        % Resolving the optimization problem
+        mpc_tau_N = mpc_prob.solve();
+        
+        % Oversight condition and setting up of the control output (reduced)
+        if ~strcmp(mpc_tau_N.info.status, 'solved')
+            MPC_stopComputation = true;
+        else
+            MPC_tau_app = mpc_tau_N.x(1:PARA_n,1);
+        end
     end
     
     
@@ -161,7 +194,7 @@ else
         end
         
     % CVX solver
-    else
+    elseif strcmp(PARA_solverSelect,'cvx')
         % Opening cvx environnement
         cvx_solver sedumi
         cvx_begin quiet
@@ -172,7 +205,13 @@ else
                 cons_out{3} * khi <= cons_out{4};
         cvx_end  
         
-        MPC_khi_app = khi(1:(4*PARA_n),1);
+        % Oversight condition and setting up of the control output (reduced)
+        if strcmp(cvx_status,'Infeasible')
+            MPC_stopComputation = true;
+        else
+            MPC_khi_app = khi(1:(4*PARA_n),1);
+        end
+          
     end
     
 end
