@@ -1,6 +1,6 @@
 
 %                      UPDATEQ
-% MPC v. 2.1
+% MPC v. 2.2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This element is used for the computation of q and dot_q at each iteration
