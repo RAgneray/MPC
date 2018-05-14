@@ -1,6 +1,6 @@
 
 %                   PLOTANIM
-% MPC v. 2.1
+% MPC v. 2.2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This script displays animation and plots from the SAVEDATA variables
