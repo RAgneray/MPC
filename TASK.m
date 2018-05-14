@@ -1,6 +1,6 @@
 
 %                   TASK
-% MPC v. 2.1
+% MPC v. 2.2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This script computes an previewed horizon of desired accelerations
