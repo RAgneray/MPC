@@ -1,6 +1,6 @@
 
 %               PARAMETERS
-% MPC v 2.1
+% MPC v 2.2
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This script initializes the variables needed to run MAIN
@@ -57,6 +57,9 @@ global PARA_robot;             % Imported robot model
 % Calling the Robotic Toolbox (Peter Corke)
 run('../rvctools/startup_rvc.m');
 
+% Adding path for OSQP
+addpath('./osqp/osqp-0.3.0-matlab-linux64')
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Setting global variables
 
@@ -67,10 +70,11 @@ PARA_useAnimation = false;
 PARA_saveFig = false;
 PARA_showIter = true;
 
-PARA_solverSelect ='quadprog'; % 'cvx';% 
-if ~any(strcmp(PARA_solverSelect,{'quadprog','cvx'}))     % Authorized values of solverSelect are 'quadprog' and 'cvx'
-    error('solverSelect value must be quadprog or cvx');  % This if-loop check if the value is correct
+PARA_solverSelect ='quadprog'; % 'cvx';% 'osqp';%
+if ~any(strcmp(PARA_solverSelect,{'quadprog','cvx','osqp'}))     % Authorized values of solverSelect are 'quadprog' and 'cvx'
+    error('solverSelect value must be quadprog, cvx or osqp');  % This if-loop check if the value is correct
 end
+% WARNING : CVX and OSQP does not work with detailed formulation
 
 PARA_useTorLimMin = false;      
 PARA_useTorLimMax = false;      
