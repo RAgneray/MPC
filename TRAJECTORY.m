@@ -1,6 +1,6 @@
 
 %                   TRAJECTORY
-% MPC v 2.1
+% MPC v 2.2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This script is a function able to generate acceleration, velocity and
