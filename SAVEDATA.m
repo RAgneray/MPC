@@ -1,6 +1,6 @@
 
 %                       SAVEDATA
-% MPC v. 2.2
+% MPC v. 2.3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This script allows to save datas at each simulation iteration
@@ -8,24 +8,19 @@
 
 % Setting up global variables
 % matrices
-global SAVE_tau_all;
-global SAVE_tau_minall;
-global SAVE_tau_maxall;
-global SAVE_ddotq_all;
-global SAVE_dotq_all;
-global SAVE_q_all;
-global SAVE_ddotq_minposall;
-global SAVE_ddotq_maxposall;
-global SAVE_ddotx_all;
-global SAVE_ddotx_refall;
-global SAVE_ddotx_desall;
-global SAVE_x_all;
-global SAVE_x_refall;
-% Variables used for diagnosing task issues
-% global SAVE_poserr;           
-% global SAVE_velerr;                 
-% global SAVE_kpposerr;                      
-% global SAVE_kdvelerr; 
+global SAVE_tau_all;                                    % Contains all the applied control torques
+global SAVE_tau_minall;                                 % Contains minimal torque bound
+global SAVE_tau_maxall;                                 % Contains maximal torque bound
+global SAVE_ddotq_all;                                  % Contains all the joint accelerations
+global SAVE_dotq_all;                                   % Contains all the joint velocities
+global SAVE_q_all;                                      % Contains all the joint positions
+global SAVE_ddotq_minposall;                            % Contains all the minimal joint acceleration limits
+global SAVE_ddotq_maxposall;                            % Contains all the maximal joint acceleration limits
+global SAVE_ddotx_all;                                  % Contains all the operational accelerations
+global SAVE_ddotx_refall;                               % Contains all the operational reference accelerations
+global SAVE_ddotx_desall;                               % Contains all the operational desired accelerations
+global SAVE_x_all;                                      % Contains all the operational positions (and orientations)
+global SAVE_x_refall;                                   % Contains all the operational reference positions (and orientations)
 
 
 % Calling global variables from other script
@@ -64,14 +59,11 @@ global MPC_khi_app;
 % matrices
 global TASK_ddotx_desN;                         
 global TASK_ddotx_refN;                          
-global TASK_x_refN;  
-global TASK_poserr;           
-global TASK_velerr;                 
-global TASK_kpposerr;                      
-global TASK_kdvelerr;                                                     
+global TASK_x_refN;
+                                                  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Using reduced form
+% If using reduced form (SAVE variables are iteratively concatenate)
 if PARA_useReduced
     SAVE_tau_all=[SAVE_tau_all, MPC_tau_app];
     SAVE_tau_minall = [SAVE_tau_minall, PARA_tau_min];
@@ -88,13 +80,13 @@ if PARA_useReduced
     save_rpy = tr2rpy(save_x);
     SAVE_x_all=[SAVE_x_all,[save_x(1:3,4);save_rpy']];
     SAVE_x_refall= TASK_x_refN;
-%    SAVE_poserr = [SAVE_poserr,TASK_poserr(:,1)];           
-%    SAVE_velerr = [SAVE_poserr,TASK_velerr(:,1)];                 
-%    SAVE_kpposerr = [SAVE_kpposerr,TASK_kpposerr(:,1)];                     
-%    SAVE_kdvelerr = [SAVE_kdvelerr,TASK_kdvelerr(:,1)]; 
     
     
-% Using detailed form
+% If using detailed form
+
+% WARNING : detailed form have been implanted but does not work properly yet. The obtained results using this method are bad control sequences most of the time 
+% Moreover, this form have been given up during the coding process because of its computing cost
+
 else
     SAVE_tau_all=[SAVE_tau_all, MPC_khi_app(1:PARA_n,1)];
     SAVE_tau_minall = [SAVE_tau_minall, PARA_tau_min];
@@ -111,8 +103,5 @@ else
     save_rpy = tr2rpy(save_x);
     SAVE_x_all=[SAVE_x_all,[save_x(1:3,4);save_rpy']];
     SAVE_x_refall= TASK_x_refN;
-%    SAVE_poserr = [SAVE_poserr,TASK_poserr(:,1)];           
-%    SAVE_velerr = [SAVE_poserr,TASK_velerr(:,1)];                 
-%    SAVE_kpposerr = [SAVE_kpposerr,TASK_kpposerr(:,1)];                     
-%    SAVE_kdvelerr = [SAVE_kdvelerr,TASK_kdvelerr(:,1)]; 
+
 end
