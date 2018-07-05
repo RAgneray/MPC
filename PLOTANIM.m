@@ -1,6 +1,6 @@
 
 %                   PLOTANIM
-% MPC v. 2.2
+% MPC v. 2.3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This script displays animation and plots from the SAVEDATA variables
@@ -37,12 +37,8 @@ global SAVE_ddotx_desall;
 global SAVE_x_all;
 global SAVE_x_refall;
 
-% Variables used for diagnosing task issues
-% global SAVE_poserr;           
-% global SAVE_velerr;                 
-% global SAVE_kpposerr;                      
-% global SAVE_kdvelerr; 
-
+% From TASK
+% vector
 global TASK_q_ref;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -52,10 +48,10 @@ if PARA_useAnimation
     for l=1:size(SAVE_q_all,2)
         hold on;
         colors={'b', 'r'};
-        plot3(PARA_x_des(1,1), PARA_x_des(2,1), PARA_x_des(3,1), colors {1,1}, 'LineWidth', 4);
+        %plot3(PARA_x_des(1,1), PARA_x_des(2,1), PARA_x_des(3,1), colors {1,1}, 'LineWidth', 4);
         hold off
         plot_transpose_q = SAVE_q_all';
-        PARA_robot.plot(plot_transpose_q(l,:));
+        PARA_robot.plot(plot_transpose_q(l,:),'delay',0.00001); % the value have to be small in order to have a fast animated robot
     end
 end
 
@@ -65,8 +61,8 @@ for l = 1:PARA_n
     subplot(2,3,l);
     hold on;
     plot(1:size(SAVE_tau_all,2), SAVE_tau_all(l,:));
-    plot(1:size(SAVE_tau_minall,2), SAVE_tau_minall(l,:));
-    plot(1:size(SAVE_tau_maxall,2), SAVE_tau_maxall(l,:));
+    plot(1:size(SAVE_tau_all,2), SAVE_tau_minall(l,:));
+    plot(1:size(SAVE_tau_all,2), SAVE_tau_maxall(l,:));
     xlabel('Iteration');
     ylabel('Torque (N.m)');
     title(strcat('DOF ',32,int2str(l)));
@@ -203,42 +199,4 @@ if PARA_saveFig
     savefig('Op_Pos.fig');
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % Figure used for diagnosing error in task
 
-% % Evolution of error between actual and reference position
-% figure(8)
-% for l = 1:PARA_n_EO
-%     hold on;
-%     subplot(2,3,l);
-%     plot(SAVE_poserr(l,:));
-%     title(strcat('DOF ',32,int2str(l)));
-%     suptitle('Error between actual and reference position');
-%     hold off;
-% end
-% 
-% % Evolution of error between actual and reference velocity
-% figure(9)
-% for l = 1:PARA_n_EO
-%     hold on;
-%     subplot(2,3,l);
-%     plot(SAVE_velerr(l,:));
-%     title(strcat('DOF ',32,int2str(l)));
-%     suptitle('Error between actual and reference velocity');
-%     hold off;
-% end
-% 
-% % Evolution of the parts of the desired acceleration
-% figure(10)
-% for l = 1:PARA_n_EO
-%     subplot(2,3,l);
-%     hold on;
-%     plot(1:size(SAVE_kpposerr,2),SAVE_kpposerr(l,:));
-%     plot(1:size(SAVE_kdvelerr,2),SAVE_kdvelerr(l,:));
-%     plot(1:size(SAVE_ddotx_refall,2),SAVE_ddotx_refall(l,:));
-%     plot(1:size(SAVE_ddotx_desall,2),SAVE_ddotx_desall(l,:));
-%     legend('kp*pos_r_e_f','kd*vel_r_e_f','reference','desired');
-%     title(strcat('DOF ',32,int2str(l)));
-%     suptitle('Evolution of the parts of the desired acceleration');
-%     hold off;
-% end
