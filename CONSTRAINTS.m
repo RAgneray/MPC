@@ -1,6 +1,6 @@
 
 %                       CONSTRAINTS
-% MPC v. 2.2
+% MPC v. 2.3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This function is used for the computation of the constraints matrices and
 % vector needed by the optimization problem
@@ -15,32 +15,43 @@ global PARA_useReduced;
 global PARA_useTorLimMin;     
 global PARA_useTorLimMax;      
 global PARA_usePosLimMin;     
-global PARA_usePosLimMax;      
+global PARA_usePosLimMax;
+global PARA_useOpeCons;
+
 % float
 global PARA_deltat_mpc;
 % integers
 global PARA_N;
 global PARA_n;
+global PARA_n_EO;
 % vector
 global PARA_q_min;
 global PARA_q_max;
 global PARA_tau_min;
 global PARA_tau_max;
+global PARA_normalVect;
+% SerialLink
+global PARA_robot;
 
 % From MAIN
 % matrices
 global MAIN_M;
 global MAIN_invM;
+global MAIN_J;
 % vectors
 global MAIN_b;
 global MAIN_g;
 global MAIN_dotq;
 global MAIN_q;
+global MAIN_distToWall;
+global MAIN_dotJ_dotq;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Checking how many constraints are enabled
+% The submatrices and subvectors linked to a constraints are added in a particular order :
+% Min Torque, Max Torque, Min Position, Max Position
 
-cons_checkCons = 0;
+cons_checkCons = 0;                                                                      % Contains the number of enabled constraints
 
 if PARA_useTorLimMin
     cons_checkCons = cons_checkCons +1;
@@ -56,6 +67,7 @@ if PARA_usePosLimMax
 end
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Using the reduced form
 
@@ -65,7 +77,19 @@ end
         cons_G = zeros(cons_checkCons * PARA_n * (PARA_N + 1), PARA_n * (PARA_N + 1));   % Inequalities constraints matrix
         cons_h = zeros(cons_checkCons * PARA_n * (PARA_N + 1), 1);                       % Inequalities constraints vector
         cons_coeff_h = 0;                                                                % Iterative variables used by cons_h
-
+        
+        if PARA_useOpeCons                                                               % Operational Constraints (Wall) submatrix and subvector are added after the robot constraints
+            GOpe = zeros(PARA_N+1,PARA_n*(PARA_N+1));
+            hOpe = zeros(PARA_N+1,1);
+            tmp_J = PARA_robot.jacob0(MAIN_q);
+            tmp_dotJdotq = PARA_robot.jacob_dot(MAIN_q,MAIN_dotq);
+        end
+        
+        % The next 'For' loop is used to fill the constraints matrix and vector regarding of the order which is used to add the constraints,
+        % the number of enabled constraints (cons_checkCons) , the number of DOF (PARA_n) and the elements already in the martrix/vector (cons_fillG/cons_fillh)
+        
+        % h is here iteratively computed (deducted from the general expression in the report) and use the loop-updated component cons_coeff_h
+        
         % Building loop
         for i = 0 : PARA_N
 
@@ -118,15 +142,38 @@ end
                     end
                 end
             end
+            
+            % Adding Operational Constraint (wall)
+            if PARA_useOpeCons
+                if i~=0
+                    for j = 1:i
+                        GOpe(1+i,((j-1)*PARA_n+1):(j*PARA_n)) = (-i+j-0.5) * PARA_deltat_mpc/norm(PARA_normalVect)*PARA_normalVect'*tmp_J(1:3,:)*MAIN_invM;
+                    end
+                    GOpe(1+i,(j*PARA_n+1):((j+1)*PARA_n)) = PARA_deltat_mpc/norm(PARA_normalVect)*PARA_normalVect'*tmp_J(1:3,:)*MAIN_invM;
+                    hOpe(1+i,1) = MAIN_distToWall/PARA_deltat_mpc + (i-1)/norm(PARA_normalVect)*PARA_normalVect'*tmp_J(1:3,:)*MAIN_dotq + 0.5*i*PARA_deltat_mpc/norm(PARA_normalVect)*PARA_normalVect'*tmp_dotJdotq(1:3,1) + (1-sum(1:i)+0.5*i)*PARA_deltat_mpc/norm(PARA_normalVect)*PARA_normalVect'*tmp_J(1:3,:)*MAIN_invM*(MAIN_b+MAIN_g);
+                end
+   
+                GOpe(1,1:PARA_n) = PARA_deltat_mpc/norm(PARA_normalVect)*PARA_normalVect'*tmp_J(1:3,:)*MAIN_invM;
+                hOpe(1,1) = MAIN_distToWall/PARA_deltat_mpc + PARA_deltat_mpc/norm(PARA_normalVect)*PARA_normalVect'*tmp_J(1:3,:)*MAIN_invM*(MAIN_b+MAIN_g) + 1/norm(PARA_normalVect)*PARA_normalVect'*tmp_J(1:3,:)*MAIN_dotq;
+    
+            end
         end
 
         %Setting up the output variable (reduced)
-        cons_out = {cons_G , cons_h};
+        if PARA_useOpeCons
+            cons_out = {[cons_G;GOpe] , [cons_h;hOpe]};
+        else
+            cons_out = {cons_G , cons_h};
+        end
 
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
     % Using the detailed form
+    
+    % WARNING : detailed form have been implanted but does not work properly yet. The obtained results using this method are bad control sequences most of the time 
+    % Moreover, this form have been given up during the coding process because of its computing cost.
+    
     else
         % Initializing
         cons_A = zeros(3 * PARA_n * (PARA_N + 1) , 2 * PARA_n * (2 * PARA_N + 1));      % Equality constraints matrix
