@@ -1,6 +1,6 @@
 
 %                   TASK
-% MPC v. 2.2
+% MPC v. 2.3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This script computes an previewed horizon of desired accelerations
@@ -76,10 +76,10 @@ else
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Generating off-line trajectory
+% Generating trajectory to follow
 
 if TASK_firstCall
-    task_trajOut = TRAJECTORY(PARA_x_des);
+    task_trajOut = TRAJECTORY();
 
     TASK_ddotx_refN = task_trajOut{3};
     TASK_dotx_refN = task_trajOut{2};
@@ -96,14 +96,6 @@ end
 % Computing desired task with PID correction
 
 TASK_ddotx_desN = zeros(PARA_n_EO,PARA_N);
-
-% Variables used for diagnosing task issues
-%if PARA_useSaveData
-%    TASK_poserr = zeros(PARA_n_EO,PARA_N);                   
-%    TASK_velerr = zeros(PARA_n_EO,PARA_N);                       
-%    TASK_kpposerr = zeros(PARA_n_EO,PARA_N);                          
-%    TASK_kdvelerr = zeros(PARA_n_EO,PARA_N);                            
-%end
 
 for i=1:(PARA_N+1)
     
@@ -132,11 +124,4 @@ for i=1:(PARA_N+1)
     task_q = task_q + PARA_deltat_simu*task_dotq + 0.5*(PARA_deltat_simu^2)*task_ddotq_des;
     task_dotq = task_dotq + PARA_deltat_simu*task_ddotq_des;
     
-    % Variables used for diagnosing task issues
-    %if PARA_useSaveData
-    %    TASK_poserr(:,i) = task_x_err;
-    %    TASK_velerr(:,i) = task_dotx_err;
-    %    TASK_kpposerr(:,i) = PARA_kp*task_x_err;
-    %    TASK_kdvelerr(:,i) = PARA_kd*task_dotx_err;
-    %end
 end
