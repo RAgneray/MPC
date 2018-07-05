@@ -1,9 +1,9 @@
 
 %                       MPC
-% MPC v. 2.2
+% MPC v. 2.3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% This script execute the computation of a horizon of control
+% This script execute the computation of a horizon of prediction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Setting global variables
@@ -215,4 +215,3 @@ else
     end
     
 end
-    
