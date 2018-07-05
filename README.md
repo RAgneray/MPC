@@ -8,3 +8,4 @@
 # To know about the trajectory generation, please check : Konstantinos J. Kyriakopoulos and George N. Saridis. Minimum jerk path generation. In Robotics and Automation, 1988 IEEE International Conference on , volume 1, pages 364-369, 1988.
 # To know quickly how work the algorithm, please check the document 0_Working flow.pdf
 # To know about the equation, please check the document 0_report.pdf (currently in French). Constraints are in subsection 3.1.2, control problem in 3.1.3, tasks in 3.2.2 and obstacle in 5.1.1.
+# To illustrate how the constraints matrix and vecto are filled, please check the figure in the document 0_Fill_G_h.pdf
