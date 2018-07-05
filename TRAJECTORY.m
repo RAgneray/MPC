@@ -1,15 +1,15 @@
-
 %                   TRAJECTORY
-% MPC v 2.2
+% MPC v 2.3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % This script is a function able to generate acceleration, velocity and
 % positions references for a minimal-jerk trajectory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [traj_out] = TRAJECTORY(task_posDes)
+function [traj_out] = TRAJECTORY()
 
 %Call the global variables
+global PARA_JointObj;
 global PARA_n;
 global PARA_n_EO;
 global PARA_N;
@@ -20,18 +20,26 @@ global PARA_robot;
 global PARA_maxVel;
 global PARA_maxAcc;
 
+global PARA_q_des;             
+global PARA_x_des;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Computing parameters for trajectory
 
 if PARA_n == 1                                                                % inverse kinematic model (ikine not adapted to less than 6 DOF robot)  
-    traj_qDes = atan2(task_posDes(2,1),task_posDes(1,1));    
+    traj_qDes = atan2(PARA_x_des(2,1),PARA_x_des(1,1));    
 elseif PARA_n == 2
-    traj_qDes(2,1) = acos(0.5*(task_posDes(1,1)^2 + task_posDes(3,1)^2) - 1);
-    traj_qDes(1,1) = atan((task_posDes(3,1)*(1+cos(traj_qDes(2,1))) - task_posDes(1,1)*sin(traj_qDes(2,1)))/(task_posDes(1,1)*(1+cos(traj_qDes(2,1))) + task_posDes(3,1)*sin(traj_qDes(2,1))));
+    if PARA_JointObj
+        traj_qDes = PARA_q_des;
+    else
+        traj_qDes(2,1) = acos(0.5*(PARA_x_des(1,1)^2 + PARA_x_des(3,1)^2) - 1);
+        traj_qDes(1,1) = atan((PARA_x_des(3,1)*(1+cos(traj_qDes(2,1))) - PARA_x_des(1,1)*sin(traj_qDes(2,1)))/(PARA_x_des(1,1)*(1+cos(traj_qDes(2,1))) + PARA_x_des(3,1)*sin(traj_qDes(2,1))));
 elseif PARA_n == 6
-    traj_qDes = PARA_robot.ikine([rpy2r(task_posDes(4:6)'),task_posDes(1:3);[0,0,0,1]]);
-    traj_qDes = traj_qDes';                                                   % Joint position corresponding to desired operational position
+    if PARA_JointObj
+        traj_qDes = PARA_q_des;
+    else
+        traj_qDes = PARA_robot.ikine([rpy2r(PARA_x_des(4:6)'),PARA_x_des(1:3);[0,0,0,1]]);
+        traj_qDes = traj_qDes';   % Joint position corresponding to desired operational position
 end
 
 
