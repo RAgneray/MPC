@@ -143,6 +143,9 @@ if PARA_useReduced
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Detailed formulation
+% WARNING : detailed form have been implanted but does not work properly yet. The obtained results using this method are bad control sequences most of the time 
+% Moreover, this form have been given up during the coding process because of its computing cost
+
 
 else
     % Initializing of matrix E and vector f
