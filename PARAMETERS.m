@@ -1,6 +1,6 @@
 
 %               PARAMETERS
-% MPC v 2.2
+% MPC v 2.3
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This script initializes the variables needed to run MAIN
@@ -19,6 +19,12 @@ global PARA_useTorLimMin;      % Enables the use of Minimal Torque Limits
 global PARA_useTorLimMax;      % Enables the use of Maximal Torque Limits
 global PARA_usePosLimMin;      % Enables the use of Minimal Position Limits
 global PARA_usePosLimMax;      % Enables the use of Maximal Position Limits
+global PARA_useOpeCons;        % Enables the use of an operational Constraints (Wall)
+global PARA_JointObj;          % Define the type of objective. 'true' for joint objective (only PARA_q_des have to be set), 'false' for operational one (only PARA_x_des have to be set).
+
+% WARNING : the use of operational (end effector) objective can resolved in error in objective definition, because the computation
+% method is using the Robotics Toolbox inverse kinematics function. Be careful while defining an operational obejcticve PARA_x_des
+% Otherwise, there is no problem with joint objective (PARA_q_des)
 
 % string
 global PARA_solverSelect       % Select the quadratic solver
@@ -42,6 +48,7 @@ global PARA_maxVel;            % Maximal velocity used by trajectory generator
 global PARA_maxAcc;            % Maximal acceleration used by trajectory generator
 
 % vectors
+global PARA_q_des;             % Joint objective
 global PARA_x_des;             % End effector objective
 global PARA_q_min;             % Lower positions bounds
 global PARA_q_max;             % Upper positions bounds
@@ -49,6 +56,8 @@ global PARA_tau_min;           % Lower torque limits
 global PARA_tau_max;           % Upper torque limits
 global PARA_q_0;               % Initial joint positions
 global PARA_dotq_0;            % Initial joint velocities
+global PARA_normalVect;        % Normal Vector defining the operational constraints (Wall)
+global PARA_wallPoint;         % Point in the wall
 
 % SerialLink
 global PARA_robot;             % Imported robot model
@@ -64,32 +73,38 @@ addpath('./osqp/osqp-0.3.0-matlab-linux64')
 % Setting global variables
 
 % Control variables
-PARA_useReduced = true;
+PARA_useReduced = true;           % WARNING : detailed formualtion does not work yet, and has been given up. Always set 'PARA_useReduced' to 'true' and use reduced form       
 PARA_useSaveData = true;
 PARA_useAnimation = false;
 PARA_saveFig = false;
 PARA_showIter = true;
 
-PARA_solverSelect ='quadprog'; % 'cvx';% 'osqp';%
-if ~any(strcmp(PARA_solverSelect,{'quadprog','cvx','osqp'}))     % Authorized values of solverSelect are 'quadprog' and 'cvx'
+PARA_solverSelect ='quadprog'; % 'osqp';% 'cvx';% 
+if ~any(strcmp(PARA_solverSelect,{'quadprog','cvx','osqp'}))     % Authorized values of solverSelect are 'quadprog', 'cvx' ans 'osqp'
     error('solverSelect value must be quadprog, cvx or osqp');  % This if-loop check if the value is correct
 end
 % WARNING : CVX and OSQP does not work with detailed formulation
 
-PARA_useTorLimMin = false;      
-PARA_useTorLimMax = false;      
-PARA_usePosLimMin = false;      
-PARA_usePosLimMax = false; 
+PARA_useTorLimMin = true;      
+PARA_useTorLimMax = true;      
+PARA_usePosLimMin = true;      
+PARA_usePosLimMax = true;
+
+% Operationnal constraints (Wall)   (NOT yet Available in detailed formulation)
+PARA_useOpeCons = true;            % WARNING : if used, PARA_n_EO cannot be more than 3
+PARA_normalVect = [0;1;0];
+PARA_normalVect = PARA_normalVect *1/norm(PARA_normalVect);
+PARA_wallPoint = [0;0;0];
 
 % Simulation
 PARA_t0 = 0;
-PARA_tend = 20.0;
-PARA_deltat_simu = 0.01;
+PARA_tend = 200.0;
+PARA_deltat_simu = 0.001;
 
 % MPC
 PARA_deltat_mpc = PARA_deltat_simu;
-PARA_N = 0;
-PARA_epsilon = 0.1;
+PARA_N =299;
+PARA_epsilon = 0.1;                 % While testing, the working weight ration omegak/epsilon is 10 000.
 PARA_omegak = 1000;
 
 % PID correction
@@ -114,9 +129,9 @@ if strcmp(PARA_robot.name,'one link')
     
     PARA_q_0 = 0.5;
     PARA_dotq_0 = 0;
-    PARA_maxVel = 0.5;        
+    PARA_maxVel = 0.5;%0.05;        
     PARA_maxAcc = NaN;
-    PARA_x_des =[0;1];
+    PARA_x_des =[-1;0];%[0;1];%[sqrt(2)*0.5;-sqrt(2)*0.5];
     
 elseif strcmp(PARA_robot.name,'two link')
     
@@ -133,7 +148,10 @@ elseif strcmp(PARA_robot.name,'two link')
     PARA_dotq_0 = [0;0];
     PARA_maxVel = 0.5;        
     PARA_maxAcc = NaN;
+    
+    PARA_JointObj = true;
     PARA_x_des =[0.2;0;0.5];
+    PARA_q_des =[0;0];
     
 elseif strcmp(PARA_robot.name,'Puma 560')
     
@@ -148,10 +166,11 @@ elseif strcmp(PARA_robot.name,'Puma 560')
     
     PARA_q_0 = [0.5;0.5;0.5;0.5;0.5;0.5];
     PARA_dotq_0 = [0;0;0;0;0;0];
-    PARA_maxVel = 0.5;        
+    PARA_maxVel = 0.05;        
     PARA_maxAcc = NaN;
-    PARA_x_des =[0.2;0.3;0.5;0;0;0];
+    
+    PARA_JointObj = true;
+    PARA_x_des =[0.5;0.2;0.3;0;0;0];
     % If orientation is used, it must be described in RPY convention
+    PARA_q_des =[0;0;0;0;0;0];
 end
-
-
